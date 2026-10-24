@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Where the joint model loses</title>
+<style>
+  body { font-family: Georgia, serif; margin: 32px auto; max-width: 920px; color: #1a1a1a; background: #fff; }
+  h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+  h2 { font-size: 18px; margin: 32px 0 8px; }
+  p { line-height: 1.45; }
+  .note { color: #555; font-size: 14px; }
+  .caption { color: #666; font-size: 12px; margin-top: 6px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid #ddd; font-size: 14px; }
+  th:first-child, td:first-child { text-align: left; }
+  svg { width: 100%; height: auto; }
+</style>
+</head>
+<body>
+<h1>Where the joint model loses</h1>
+<p class="note">Recreated best-gap test split, fold 0, 102 rows. A loss is a row where the worse of the frozen and fine-tuned joint probabilities is farther from the label than the better single-modality probability.</p>
+
+<h2>High leverage is the only shared pattern</h2>
+<p>Share of rows with debt-to-assets above 0.80. Losses carry that leverage more often than gains for every model.</p>
+<svg viewBox="0 0 860 320" role="img" aria-label="Share of rows with debt-to-assets above 0.80, joint losses versus joint gains">
+  <text x="40" y="22" font-size="13" font-family="sans-serif">Share of rows (%)</text>
+  <line x1="70" y1="40" x2="70" y2="260" stroke="#999"/>
+  <line x1="70" y1="260" x2="820" y2="260" stroke="#999"/>
+  <text x="48" y="264" font-size="11" font-family="sans-serif">0</text>
+  <text x="40" y="118" font-size="11" font-family="sans-serif">20</text>
+  <text x="40" y="44" font-size="11" font-family="sans-serif">30</text>
+  <line x1="70" y1="113" x2="820" y2="113" stroke="#eee"/>
+</svg>
+<script>
+const models = ["LightGBM", "CatBoost", "TabM", "TabPFN 2.0", "TabPFN 2.5"];
+const lossDebt = [19.0, 17.0, 22.2, 19.7, 20.3];
+const gainDebt = [8.7, 14.3, 10.4, 7.7, 4.3];
+const svg = document.querySelector("svg");
+const ns = "http://www.w3.org/2000/svg";
+function bar(x, y, w, h, fill) {
+  const r = document.createElementNS(ns, "rect");
+  r.setAttribute("x", x); r.setAttribute("y", y);
+  r.setAttribute("width", w); r.setAttribute("height", h);
+  r.setAttribute("fill", fill);
+  svg.appendChild(r);
+}
+function label(x, y, text, anchor) {
+  const t = document.createElementNS(ns, "text");
+  t.setAttribute("x", x); t.setAttribute("y", y);
+  t.setAttribute("font-size", "12");
+  t.setAttribute("font-family", "sans-serif");
+  t.setAttribute("text-anchor", anchor || "middle");
+  t.textContent = text;
+  svg.appendChild(t);
+}
+const max = 30;
+const base = 260;
+const scale = (base - 40) / max;
+models.forEach((name, i) => {
+  const x = 110 + i * 140;
+  const h1 = lossDebt[i] * scale;
+  const h2 = gainDebt[i] * scale;
+  bar(x, base - h1, 36, h1, "#b42318");
+  bar(x + 42, base - h2, 36, h2, "#027a48");
+  label(x + 18, base - h1 - 6, lossDebt[i].toFixed(1));
+  label(x + 60, base - h2 - 6, gainDebt[i].toFixed(1));
+  label(x + 39, 282, name);
+});
+label(250, 308, "Red: joint loss", "start");
+label(420, 308, "Green: joint gain", "start");
+</script>
+<p class="caption">Source: diagnostic_predictions.csv, fold 0 of the recreated v3 sample. Percent of rows in each group.</p>
+
+<h2>Cash and current ratio do not mark the losses</h2>
+<p>Percentage points by which the loss group exceeds the gain group. Above zero means the trait is more common where the joint model loses. Only high leverage stays positive for every model.</p>
+<table>
+  <tr><th>Model</th><th>Debt above 0.80</th><th>Cash above 0.50</th><th>Current ratio above 4</th></tr>
+  <tr><td>LightGBM</td><td>+10.3</td><td>−8.5</td><td>+1.1</td></tr>
+  <tr><td>CatBoost</td><td>+2.7</td><td>+4.3</td><td>+9.6</td></tr>
+  <tr><td>TabM</td><td>+11.8</td><td>−3.2</td><td>−12.5</td></tr>
+  <tr><td>TabPFN 2.0</td><td>+12.0</td><td>−1.0</td><td>−0.7</td></tr>
+  <tr><td>TabPFN 2.5</td><td>+16.0</td><td>−8.5</td><td>+1.1</td></tr>
+</table>
+<p class="caption">Source: same test split. Loss share minus gain share, in percentage points.</p>
+
+<h2>Short excerpts are normal in both groups</h2>
+<p>The whole test split has a median of 51 words. Loss and gain medians stay within a few words of that.</p>
+<table>
+  <tr><th>Model</th><th>Loss median (words)</th><th>Gain median (words)</th></tr>
+  <tr><td>LightGBM</td><td>51</td><td>47</td></tr>
+  <tr><td>CatBoost</td><td>52</td><td>44</td></tr>
+  <tr><td>TabM</td><td>52</td><td>48</td></tr>
+  <tr><td>TabPFN 2.0</td><td>52</td><td>46</td></tr>
+  <tr><td>TabPFN 2.5</td><td>52</td><td>45</td></tr>
+</table>
+<p class="caption">Source: same test split. Median whitespace word count of the Item 1A excerpt.</p>
+
+<h2>Counts</h2>
+<table>
+  <tr><th>Model</th><th>Losses</th><th>Gains</th><th>Losses with debt above 0.80</th><th>Gains with debt above 0.80</th></tr>
+  <tr><td>LightGBM</td><td>79</td><td>23</td><td>19%</td><td>9%</td></tr>
+  <tr><td>CatBoost</td><td>88</td><td>14</td><td>17%</td><td>14%</td></tr>
+  <tr><td>TabM</td><td>54</td><td>48</td><td>22%</td><td>10%</td></tr>
+  <tr><td>TabPFN 2.0</td><td>76</td><td>26</td><td>20%</td><td>8%</td></tr>
+  <tr><td>TabPFN 2.5</td><td>79</td><td>23</td><td>20%</td><td>4%</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,14 @@
+21:10:04 baseline delta_joint 0.0364 delta_awareness 0.0180 sum 0.0544
+21:10:04 start drop_fiscal_year
+22:28:59 drop_fiscal_year delta_joint 0.0404 delta_awareness 0.0060 sum 0.0464 REVERT (78.9 min)
+22:28:59 start clip_debt_0.80
+23:43:22 clip_debt_0.80 delta_joint 0.0104 delta_awareness 0.0410 sum 0.0514 REVERT (74.4 min)
+23:43:22 start signed_log_skewed
+00:56:30 signed_log_skewed delta_joint 0.0376 delta_awareness 0.0138 sum 0.0514 REVERT (73.1 min)
+00:56:30 start drop_cash_to_assets
+02:09:50 drop_cash_to_assets delta_joint 0.0294 delta_awareness 0.0086 sum 0.0380 REVERT (73.3 min)
+02:09:50 start winsor_5_95
+03:23:45 winsor_5_95 delta_joint 0.0466 delta_awareness -0.0198 sum 0.0268 REVERT (73.9 min)
+03:23:45 start drop_asset_turnover
+04:37:48 drop_asset_turnover delta_joint 0.0292 delta_awareness 0.0132 sum 0.0424 REVERT (74.1 min)
+04:37:48 done best delta_joint 0.0364 delta_awareness 0.0180 sum 0.0544

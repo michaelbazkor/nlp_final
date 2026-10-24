@@ -1,0 +1,7 @@
+variant,decision,delta_joint,delta_awareness,sum,minutes
+drop_fiscal_year,revert,0.0404,0.006,0.0464,78.9
+clip_debt_0.80,revert,0.0104,0.041,0.0514,74.4
+signed_log_skewed,revert,0.0376,0.0138,0.0514,73.1
+drop_cash_to_assets,revert,0.0294,0.0086,0.038,73.3
+winsor_5_95,revert,0.0466,-0.0198,0.0268,73.9
+drop_asset_turnover,revert,0.0292,0.0132,0.0424,74.1

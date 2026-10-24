@@ -1,0 +1,172 @@
+{
+  "dataset": "BIN_TEXT_SEC_MDA_DISTRESS",
+  "structured_source": "https://www.sec.gov/files/dera/data/financial-statement-data-sets/{quarter}.zip",
+  "text_source": "https://huggingface.co/datasets/eloukas/edgar-corpus",
+  "sec_quarters": [
+    "2015q1",
+    "2015q2",
+    "2015q3",
+    "2015q4",
+    "2016q1",
+    "2016q2",
+    "2016q3",
+    "2016q4",
+    "2017q1",
+    "2017q2",
+    "2017q3",
+    "2017q4",
+    "2018q1",
+    "2018q2",
+    "2018q3",
+    "2018q4",
+    "2019q1",
+    "2019q2",
+    "2019q3",
+    "2019q4",
+    "2020q1",
+    "2020q2",
+    "2020q3",
+    "2020q4",
+    "2021q1",
+    "2021q2",
+    "2021q3",
+    "2021q4"
+  ],
+  "edgar_years": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020
+  ],
+  "feature_years": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020
+  ],
+  "join_keys": [
+    "cik",
+    "fy"
+  ],
+  "year_shift_added_to_edgar_year": 0,
+  "overlap_by_shift": {
+    "-1": 21376,
+    "0": 28886,
+    "1": 21501
+  },
+  "apple_cik": "0000320193",
+  "apple_fy": 2018,
+  "apple_item1a_words_in_edgar_year": 7991,
+  "text_section": "section_1A",
+  "text_compression": "first sentence of each Item 1A paragraph, after dropping the risk-factor legend, generic boilerplate phrases, sentences outside 8 to 42 words, sentences that are at least 12 percent digits, sentences copied into more than 15 percent of filings, and sentences whose content words appear on average in more than 15 percent of filings; the first 10 remaining sentences are kept",
+  "idf": {
+    "filings_scored": 34739,
+    "exact_sentence_types_above_15pct": 0,
+    "exact_sentence_occurrences_dropped": 0,
+    "generic_word_occurrences_dropped": 2747164,
+    "max_lead_sentences": 10,
+    "selection": "first 10 specific leads in document order"
+  },
+  "boundary": {
+    "eligible_for_boundary": 6004,
+    "extreme_trim": 0,
+    "positive_tail": 1501,
+    "negative_tail": 3302,
+    "rows_after_boundary": 4803
+  },
+  "min_section_words_exclusive": 40,
+  "sample_size": 1000,
+  "sample_seed": 42,
+  "sample_method": "v3 seed-42 1000-row table, same 25/55 label; debt_to_assets above 0.8 uses up to 10 leverage leads that passed the length filters",
+  "e5_prefix": "MulTaBench already encodes text as 'passage: risk_excerpt: ...'. The CSV does not add a second passage prefix.",
+  "filings_after_dedup": 36587,
+  "unique_firms": 8642,
+  "edgar_rows": 34739,
+  "inner_join_rows": 28886,
+  "rows_before_sample": 4803,
+  "rows_after_long_item1a_filter": 8032,
+  "rows_written": 1000,
+  "label_rule": "boundary_tails",
+  "label_positive_rate_before_sample": 0.3125130127003956,
+  "label_positive_rate": 0.305,
+  "class_counts": {
+    "0": 695,
+    "1": 305
+  },
+  "rows_after_boundary": 4803,
+  "columns_kept": [
+    "log_total_assets",
+    "debt_to_assets",
+    "current_ratio",
+    "cash_to_assets",
+    "asset_turnover",
+    "capex_to_assets",
+    "fiscal_year",
+    "risk_excerpt",
+    "distress_next_year"
+  ],
+  "columns_removed_from_features": [
+    "operating_margin",
+    "interest_coverage",
+    "quick_ratio",
+    "return_on_assets",
+    "gross_margin",
+    "debt_to_equity",
+    "capex_to_revenue",
+    "yoy_revenue_growth",
+    "sic_division"
+  ],
+  "columns_dropped_as_identifiers_or_levels": [
+    "cik",
+    "adsh",
+    "name",
+    "sic",
+    "form",
+    "filed",
+    "assets",
+    "liabilities",
+    "equity",
+    "revenue",
+    "operating_income",
+    "net_income",
+    "interest",
+    "capex",
+    "ocf",
+    "opinc_next",
+    "interest_next",
+    "ocf_next"
+  ],
+  "required_column_relaxations": [],
+  "winsor_cutpoints": {
+    "log_total_assets": {
+      "p01": 13.031955587824026,
+      "p99": 24.638323518904617
+    },
+    "debt_to_assets": {
+      "p01": 0.05103924439965929,
+      "p99": 5.807318792345726
+    },
+    "current_ratio": {
+      "p01": 0.057399686044102546,
+      "p99": 22.14679502484731
+    },
+    "cash_to_assets": {
+      "p01": 0.00019351734393097898,
+      "p99": 0.9183575946340827
+    },
+    "asset_turnover": {
+      "p01": 0.0,
+      "p99": 3.8452425294401436
+    },
+    "capex_to_assets": {
+      "p01": 3.7690957569383636e-05,
+      "p99": 0.29691745551331933
+    }
+  },
+  "target": "distress_next_year",
+  "target_definition": "A lower composite of the year-t to year-t+1 changes in operating income, interest coverage, and operating cash flow is worse. The worst 25 percent of that score is 1 and the best 55 percent is 0. The middle 20 percent is excluded.",
+  "variant": "high_debt_leverage_excerpt",
+  "high_debt_excerpts_rewritten": 187
+}

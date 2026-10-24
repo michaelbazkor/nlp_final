@@ -1,0 +1,67 @@
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+waiting for fold4_both.py to exit
+fold4_both.py is not running
+device cuda fold 0 jobs 20
+progress 1/20 light structured
+progress 2/20 light text_only
+progress 3/20 light joint_frozen
+progress 4/20 light joint_tar
+progress 5/20 cat structured
+progress 6/20 cat text_only
+progress 7/20 cat joint_frozen
+progress 8/20 cat joint_tar
+progress 9/20 tabm structured
+progress 10/20 tabm text_only
+progress 11/20 tabm joint_frozen
+progress 12/20 tabm joint_tar
+progress 13/20 tabpfnv2 structured
+progress 14/20 tabpfnv2 text_only
+progress 15/20 tabpfnv2 joint_frozen

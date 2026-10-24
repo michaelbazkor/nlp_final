@@ -1,0 +1,112 @@
+device cuda variants 5 fold 1
+start winsor_5_95
+winsor_5_95 1/20 light structured
+winsor_5_95 2/20 light text_only
+winsor_5_95 3/20 light joint_frozen
+winsor_5_95 4/20 light joint_tar
+winsor_5_95 5/20 cat structured
+winsor_5_95 6/20 cat text_only
+winsor_5_95 7/20 cat joint_frozen
+winsor_5_95 8/20 cat joint_tar
+winsor_5_95 9/20 tabm structured
+winsor_5_95 10/20 tabm text_only
+winsor_5_95 11/20 tabm joint_frozen
+winsor_5_95 12/20 tabm joint_tar
+winsor_5_95 13/20 tabpfnv2 structured
+winsor_5_95 14/20 tabpfnv2 text_only
+winsor_5_95 15/20 tabpfnv2 joint_frozen
+winsor_5_95 16/20 tabpfnv2 joint_tar
+winsor_5_95 17/20 tabpfnv2p5 structured
+winsor_5_95 18/20 tabpfnv2p5 text_only
+winsor_5_95 19/20 tabpfnv2p5 joint_frozen
+winsor_5_95 20/20 tabpfnv2p5 joint_tar
+winsor_5_95 two-fold delta_joint -0.0038 delta_awareness 0.0078 sum 0.0040
+start drop_fiscal_year
+drop_fiscal_year 1/20 light structured
+drop_fiscal_year 2/20 light text_only
+drop_fiscal_year 3/20 light joint_frozen
+drop_fiscal_year 4/20 light joint_tar
+drop_fiscal_year 5/20 cat structured
+drop_fiscal_year 6/20 cat text_only
+drop_fiscal_year 7/20 cat joint_frozen
+drop_fiscal_year 8/20 cat joint_tar
+drop_fiscal_year 9/20 tabm structured
+drop_fiscal_year 10/20 tabm text_only
+drop_fiscal_year 11/20 tabm joint_frozen
+drop_fiscal_year 12/20 tabm joint_tar
+drop_fiscal_year 13/20 tabpfnv2 structured
+drop_fiscal_year 14/20 tabpfnv2 text_only
+drop_fiscal_year 15/20 tabpfnv2 joint_frozen
+drop_fiscal_year 16/20 tabpfnv2 joint_tar
+drop_fiscal_year 17/20 tabpfnv2p5 structured
+drop_fiscal_year 18/20 tabpfnv2p5 text_only
+drop_fiscal_year 19/20 tabpfnv2p5 joint_frozen
+drop_fiscal_year 20/20 tabpfnv2p5 joint_tar
+drop_fiscal_year two-fold delta_joint 0.0238 delta_awareness 0.0040 sum 0.0278
+start signed_log_skewed
+signed_log_skewed 1/20 light structured
+signed_log_skewed 2/20 light text_only
+signed_log_skewed 3/20 light joint_frozen
+signed_log_skewed 4/20 light joint_tar
+signed_log_skewed 5/20 cat structured
+signed_log_skewed 6/20 cat text_only
+signed_log_skewed 7/20 cat joint_frozen
+signed_log_skewed 8/20 cat joint_tar
+signed_log_skewed 9/20 tabm structured
+signed_log_skewed 10/20 tabm text_only
+signed_log_skewed 11/20 tabm joint_frozen
+signed_log_skewed 12/20 tabm joint_tar
+signed_log_skewed 13/20 tabpfnv2 structured
+signed_log_skewed 14/20 tabpfnv2 text_only
+signed_log_skewed 15/20 tabpfnv2 joint_frozen
+signed_log_skewed 16/20 tabpfnv2 joint_tar
+signed_log_skewed 17/20 tabpfnv2p5 structured
+signed_log_skewed 18/20 tabpfnv2p5 text_only
+signed_log_skewed 19/20 tabpfnv2p5 joint_frozen
+signed_log_skewed 20/20 tabpfnv2p5 joint_tar
+signed_log_skewed two-fold delta_joint 0.0142 delta_awareness 0.0106 sum 0.0248
+start floor_assets
+floor_assets 1/20 light structured
+floor_assets 2/20 light text_only
+floor_assets 3/20 light joint_frozen
+floor_assets 4/20 light joint_tar
+floor_assets 5/20 cat structured
+floor_assets 6/20 cat text_only
+floor_assets 7/20 cat joint_frozen
+floor_assets 8/20 cat joint_tar
+floor_assets 9/20 tabm structured
+floor_assets 10/20 tabm text_only
+floor_assets 11/20 tabm joint_frozen
+floor_assets 12/20 tabm joint_tar
+floor_assets 13/20 tabpfnv2 structured
+floor_assets 14/20 tabpfnv2 text_only
+floor_assets 15/20 tabpfnv2 joint_frozen
+floor_assets 16/20 tabpfnv2 joint_tar
+floor_assets 17/20 tabpfnv2p5 structured
+floor_assets 18/20 tabpfnv2p5 text_only
+floor_assets 19/20 tabpfnv2p5 joint_frozen
+floor_assets 20/20 tabpfnv2p5 joint_tar
+floor_assets two-fold delta_joint -0.0078 delta_awareness 0.0102 sum 0.0024
+start clip_debt_0.80
+clip_debt_0.80 1/20 light structured
+clip_debt_0.80 2/20 light text_only
+clip_debt_0.80 3/20 light joint_frozen
+clip_debt_0.80 4/20 light joint_tar
+clip_debt_0.80 5/20 cat structured
+clip_debt_0.80 6/20 cat text_only
+clip_debt_0.80 7/20 cat joint_frozen
+clip_debt_0.80 8/20 cat joint_tar
+clip_debt_0.80 9/20 tabm structured
+clip_debt_0.80 10/20 tabm text_only
+clip_debt_0.80 11/20 tabm joint_frozen
+clip_debt_0.80 12/20 tabm joint_tar
+clip_debt_0.80 13/20 tabpfnv2 structured
+clip_debt_0.80 14/20 tabpfnv2 text_only
+clip_debt_0.80 15/20 tabpfnv2 joint_frozen
+clip_debt_0.80 16/20 tabpfnv2 joint_tar
+clip_debt_0.80 17/20 tabpfnv2p5 structured
+clip_debt_0.80 18/20 tabpfnv2p5 text_only
+clip_debt_0.80 19/20 tabpfnv2p5 joint_frozen
+clip_debt_0.80 20/20 tabpfnv2p5 joint_tar
+clip_debt_0.80 two-fold delta_joint -0.0036 delta_awareness 0.0214 sum 0.0178
+restored capex-dropped table

@@ -1,0 +1,18 @@
+device cuda fold 2 jobs 60
+start drop_fiscal_year
+progress 10% (6/60) drop_fiscal_year cat text_only
+progress 20% (12/60) drop_fiscal_year tabm joint_tar
+progress 30% (18/60) drop_fiscal_year tabpfnv2p5 text_only
+drop_fiscal_year three-fold delta_joint 0.0230 delta_awareness 0.0076 sum 0.0306
+start signed_log_skewed
+progress 40% (24/60) signed_log_skewed light joint_tar
+progress 50% (30/60) signed_log_skewed tabm text_only
+progress 60% (36/60) signed_log_skewed tabpfnv2 joint_tar
+signed_log_skewed three-fold delta_joint 0.0166 delta_awareness 0.0080 sum 0.0246
+start nofy_signed_log
+progress 70% (42/60) nofy_signed_log light text_only
+progress 80% (48/60) nofy_signed_log cat joint_tar
+progress 90% (54/60) nofy_signed_log tabpfnv2 text_only
+progress 100% (60/60) nofy_signed_log tabpfnv2p5 joint_tar
+nofy_signed_log three-fold delta_joint 0.0128 delta_awareness 0.0142 sum 0.0270
+restored capex-dropped table

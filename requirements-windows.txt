@@ -1,0 +1,30 @@
+# Windows runtime for the five MulTaBench learners and E5 LoRA.
+# torch and torchvision are the CUDA 12.8 wheels. Install them from
+# https://download.pytorch.org/whl/cu128 before this file, and reinstall them
+# with --force-reinstall --no-deps afterward if another package replaces them.
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+transformers==5.20.1
+peft==0.21.2
+sentence-transformers==6.1.0
+tabstar==1.1.16
+tabpfn==7.1.1
+pytabkit==1.7.3
+catboost==1.2.10
+lightgbm==4.7.0
+scikit-learn==1.9.1
+pandas==3.0.6
+numpy==2.5.4
+scipy==1.18.1
+skrub==0.11.0
+python-dotenv==1.2.4
+datasets==5.1.0
+huggingface_hub==1.33.0
+pyarrow==26.0.0
+requests==2.34.2
+tqdm==4.70.1
+joblib==1.6.0
+wandb==0.31.0
+kagglehub==1.0.2
+openml==0.15.1
+setuptools==78.1.0

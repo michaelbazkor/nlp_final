@@ -1,0 +1,20 @@
+device cuda fold 4 jobs 20
+progress 10% (2/20) light text_only
+progress 20% (4/20) light joint_tar
+progress 30% (6/20) cat text_only
+progress 40% (8/20) cat joint_tar
+progress 50% (10/20) tabm text_only
+progress 60% (12/20) tabm joint_tar
+progress 70% (14/20) tabpfnv2 text_only
+progress 80% (16/20) tabpfnv2 joint_tar
+progress 90% (18/20) tabpfnv2p5 text_only
+progress 100% (20/20) tabpfnv2p5 joint_tar
+     model  structured  text_only  joint_frozen  joint_tar  delta_joint  delta_awareness
+     light       0.599      0.516         0.580      0.581      -0.0190           0.0010
+       cat       0.601      0.541         0.608      0.596       0.0070          -0.0120
+      tabm       0.523      0.548         0.555      0.569       0.0070           0.0140
+  tabpfnv2       0.570      0.568         0.595      0.605       0.0250           0.0100
+tabpfnv2p5       0.569      0.584         0.590      0.603       0.0060           0.0130
+   average       0.572      0.551         0.586      0.591       0.0052           0.0052
+five-fold delta_joint 0.0052 delta_awareness 0.0052 sum 0.0104
+restored capex-dropped table

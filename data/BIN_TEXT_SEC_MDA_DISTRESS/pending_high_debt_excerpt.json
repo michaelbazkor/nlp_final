@@ -1,0 +1,11 @@
+{
+  "rows": 1000,
+  "high_debt_rows": 200,
+  "excerpts_rewritten": 187,
+  "high_debt_kept_original": 13,
+  "high_debt_rows_with_a_leverage_term": 187,
+  "median_leverage_term_hits": 8.0,
+  "high_debt_median_words_before": 51.0,
+  "high_debt_median_words_after": 149.5,
+  "positive_rate": 0.305
+}
