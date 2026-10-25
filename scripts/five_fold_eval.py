@@ -59,9 +59,13 @@ def log(out_dir: Path, message: str) -> None:
         handle.write(message + "\n")
 
 
-def gaps_from_means(scores: dict[str, dict[str, float]], conditions: list[str]) -> pd.DataFrame:
+def gaps_from_means(
+    scores: dict[str, dict[str, float]],
+    conditions: list[str],
+    models: list,
+) -> pd.DataFrame:
     rows = []
-    for model in [item.SHORT_NAME for item in MODELS]:
+    for model in [item.SHORT_NAME for item in models]:
         rounded = {name: round(scores[model][name], 3) for name in conditions}
         row = {"model": model, **rounded}
         row["delta_joint"] = round(
@@ -85,6 +89,11 @@ def main() -> None:
     source = Path(os.environ["EVAL_TABLE"]).resolve()
     out_dir = Path(os.environ["EVAL_OUT"]).resolve()
     skip_tar = os.environ.get("SKIP_TAR", "0") == "1"
+    selected = {name.strip() for name in os.environ.get("EVAL_MODELS", "").split(",") if name.strip()}
+    models = [model for model in MODELS if not selected or model.SHORT_NAME in selected]
+    if selected and {model.SHORT_NAME for model in models} != selected:
+        known = ", ".join(model.SHORT_NAME for model in MODELS)
+        raise SystemExit(f"unknown EVAL_MODELS {sorted(selected)}; known: {known}")
     conditions = [item for item in CONDITIONS if not (skip_tar and item[0] == "joint_tar")]
     os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
     os.environ.setdefault("WANDB_MODE", "disabled")
@@ -99,7 +108,7 @@ def main() -> None:
     table.to_csv(DATA_PATH, index=False)
     jobs = [
         (model_cls, condition, state, tune, fold)
-        for model_cls in MODELS
+        for model_cls in models
         for condition, state, tune in conditions
         for fold in FOLDS
     ]
@@ -127,7 +136,7 @@ def main() -> None:
                 log(out_dir, f"progress {index}/{len(jobs)} {model_cls.SHORT_NAME} {condition} fold {fold}")
         present = [name for name, _, _ in conditions]
         scores: dict[str, dict[str, float]] = {}
-        for model in MODELS:
+        for model in models:
             scores[model.SHORT_NAME] = {}
             for condition in present:
                 fold_scores = []
@@ -136,7 +145,7 @@ def main() -> None:
                     with path.open(encoding="utf-8") as handle:
                         fold_scores.append(float(json.load(handle)["test_score"]))
                 scores[model.SHORT_NAME][condition] = mean(fold_scores)
-        summary = gaps_from_means(scores, present)
+        summary = gaps_from_means(scores, present, models)
         name = "frozen_summary.csv" if skip_tar else "five_fold_summary.csv"
         summary.to_csv(out_dir / name, index=False)
         average = summary.loc[summary["model"] == "average"].iloc[0]

@@ -1,6 +1,8 @@
 # SEC 10-K Item 1A benchmark dataset
 
-Standard MulTaBench track, strategy 3. The curated table is `data/BIN_TEXT_SEC_MDA_DISTRESS/data.csv`: 1,000 firm-years drawn at random with sample seed 42. Item 1A keeps the first 10 specific lead sentences. The label keeps the worst 25 percent and the best 55 percent of a next-year deterioration score. Ratios stay on their original scale. Training uses fold 0 only.
+Standard MulTaBench track, strategy 3. The curated table is `data/BIN_TEXT_SEC_MDA_DISTRESS/data.csv`: 1,000 firm-years drawn at random with sample seed 42. The label keeps the worst 25 percent and the best 55 percent of a next-year deterioration score. Fiscal year is removed. The current ratio and asset turnover use a signed log. The text is up to eight content phrases, chosen on the firm-years outside this draw, plus the shortest Item 1A sentence that contains the first phrase, cut at 20 words.
+
+The write-up is `paper/main.pdf`. The official five-fold scores are in `results/gap_search/five_fold_loop/single_column_host_eval/five_fold_summary.csv`. On that table every learner has both gaps positive. The mean joint gap is +0.020 and the mean fine-tuning gap is +0.012.
 
 Raw SEC and EDGAR downloads are cached under `%USERPROFILE%\.cache\nlp-sec`, outside this OneDrive folder. The virtualenv is `%USERPROFILE%\.venvs\nlp-multabench`.
 
@@ -24,7 +26,7 @@ Then run:
 .\scripts\train_curation.ps1
 ```
 
-That calls the official `evaluate_on_dataset` path for LightGBM, CatBoost, TabM, TabPFN 2.0, and TabPFN 2.5, under structured, text-only, joint frozen, and joint TAR, for fold 0 only. It does not start a Weights & Biases run. Scores land in `results/BIN_TEXT_SEC_MDA_DISTRESS/evaluation_report.csv`.
+That calls the official `evaluate_on_dataset` path for LightGBM, CatBoost, TabM, TabPFN 2.0, and TabPFN 2.5, under structured, text-only, joint frozen, and joint TAR. The reported result uses all five folds. `scripts/five_fold_eval.py` is the runner for that table. It does not start a Weights & Biases run. The five-fold scores are in `results/gap_search/five_fold_loop/single_column_host_eval/`.
 
 Torch is installed from the CUDA 12.8 wheel index. If a later package replaces it, reinstall with:
 
