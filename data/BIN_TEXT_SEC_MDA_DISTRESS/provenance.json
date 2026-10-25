@@ -60,7 +60,7 @@
   "apple_fy": 2018,
   "apple_item1a_words_in_edgar_year": 7991,
   "text_section": "section_1A",
-  "text_compression": "first sentence of each Item 1A paragraph, after dropping the risk-factor legend, generic boilerplate phrases, sentences outside 8 to 42 words, sentences that are at least 12 percent digits, sentences copied into more than 15 percent of filings, and sentences whose content words appear on average in more than 15 percent of filings; the first 10 remaining sentences are kept",
+  "text_compression": "Phrases come from a TF-IDF logistic model fit on the 3,803 firm-years outside the seed-42 draw. Each evaluation filing keeps up to eight content phrases. The reported excerpt appends the shortest frequency-filtered Item 1A sentence that contains the first phrase, cut at 20 words. 189 filings with no phrase keep the original ten leads.",
   "idf": {
     "filings_scored": 34739,
     "exact_sentence_types_above_15pct": 0,
@@ -79,7 +79,7 @@
   "min_section_words_exclusive": 40,
   "sample_size": 1000,
   "sample_seed": 42,
-  "sample_method": "v3 seed-42 1000-row table, same 25/55 label, capex_to_assets removed",
+  "sample_method": "v3 seed-42 1000-row table, 25/55 label, capex_to_assets removed, fiscal year removed, signed log on current_ratio and asset_turnover, risk excerpt is up to eight content phrases plus the shortest host sentence, truncated to 20 words",
   "e5_prefix": "MulTaBench already encodes text as 'passage: risk_excerpt: ...'. The CSV does not add a second passage prefix.",
   "filings_after_dedup": 36587,
   "unique_firms": 8642,
@@ -102,7 +102,6 @@
     "current_ratio",
     "cash_to_assets",
     "asset_turnover",
-    "fiscal_year",
     "risk_excerpt",
     "distress_next_year"
   ],
@@ -167,5 +166,12 @@
   },
   "target": "distress_next_year",
   "target_definition": "A lower composite of the year-t to year-t+1 changes in operating income, interest coverage, and operating cash flow is worse. The worst 25 percent of that score is 1 and the best 55 percent is 0. The middle 20 percent is excluded.",
-  "variant": "nocapex"
+  "variant": "nocapex",
+  "five_fold_gap": {
+    "table": "single_column_host",
+    "delta_joint": 0.0204,
+    "delta_awareness": 0.012,
+    "sum": 0.0324,
+    "learners_with_both_gaps_positive": 5
+  }
 }

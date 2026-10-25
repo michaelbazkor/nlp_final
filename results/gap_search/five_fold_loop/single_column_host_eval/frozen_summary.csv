@@ -1,0 +1,7 @@
+model,structured,text_only,joint_frozen,delta_joint
+light,0.599,0.57,0.62,0.021
+cat,0.601,0.589,0.628,0.027
+tabm,0.523,0.516,0.543,0.02
+tabpfnv2,0.57,0.559,0.583,0.013
+tabpfnv2p5,0.569,0.562,0.59,0.021
+average,0.572,0.559,0.593,0.0204
