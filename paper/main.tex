@@ -1,0 +1,304 @@
+\documentclass{article}
+
+\usepackage[preprint]{neurips_2024}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{microtype}
+
+\title{When 10-K Risk Text Adds to Accounting Ratios:\\
+A Text-Tabular Dataset for Next-Year Deterioration}
+
+\author{Michael}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Annual reports contain both accounting ratios and a long risk-factor discussion.
+We ask whether that text carries information about next-year financial deterioration beyond the ratios, and whether adapting the text encoder to the label adds anything further.
+We join SEC financial statements to Item~1A of the EDGAR corpus, compress the risk section to ten specific lead sentences, and draw 1{,}000 firm-years.
+Five tabular learners are compared under structured, text-only, frozen-joint, and fine-tuned-joint conditions on five stratified folds.
+On the final table the mean joint gap is $+0.005$ AUROC and the mean fine-tuning gap is $+0.005$.
+Three of the five learners clear both gaps.
+A single fold had made the same recipe look several times larger, so the result is a small, split-sensitive gain rather than a large multimodal effect.
+\end{abstract}
+
+\section{Introduction}
+
+A Form 10-K states the same year twice: once as financial statements and once as prose.
+Accounting ratios have long been used to separate failing firms from healthy ones \citep{altman1968financial}.
+The risk-factor section, Item~1A, is where management describes what could make the next year worse.
+Those two views are not the same object.
+A ratio records the current balance sheet.
+A risk sentence records a contingency that may not yet be visible in the accounts.
+
+Text-tabular learning asks whether the prose still helps once the numbers are available.
+\citet{arazi2026multabench} separate that question into two measurable gaps.
+The joint gap is the gain of a frozen text-and-table model over the better single modality.
+The awareness gap is the further gain from steering the text encoder toward the prediction target.
+A useful dataset should show both, and should not do so only because the text restates a column that is already in the table.
+
+This project builds that dataset for next-year deterioration and evaluates it with the official MulTaBench protocol.
+The contribution is the curation, not a new model.
+We keep ratios that describe size, leverage, liquidity, and turnover, and we keep only the Item~1A sentences that are specific to the filing.
+Across five folds the two gaps are positive but small.
+The same table, read on the split used to design it, overstated both.
+
+\section{Related Work}
+
+Gradient-boosted trees remain strong tabular baselines.
+LightGBM grows trees leaf-wise \citep{ke2017lightgbm}.
+CatBoost reduces the bias of ordered boosting and handles heterogeneous columns \citep{prokhorenkova2018catboost}.
+TabM shows that a parameter-efficient ensemble of multilayer perceptrons can match more elaborate tabular networks \citep{gorishniy2025tabm}.
+TabPFN takes a different route: a transformer pretrained on synthetic tables performs in-context prediction on small datasets \citep{hollmann2025tabpfn}.
+TabPFN-2.5 extends that model to larger tables \citep{grinsztajn2025tabpfn25}.
+MulTaBench evaluates exactly this mix, two tree models, TabM, and the two TabPFN versions, so that a dataset is not accepted because it suits only one learner \citep{arazi2026multabench}.
+
+Unstructured inputs enter these models as embeddings.
+E5-small is a contrastively trained text encoder \citep{wang2022e5}.
+A frozen encoder is optimized for general semantic similarity, so it can miss the wording that matters for one label.
+LoRA adapts a few low-rank weights without retraining the full network \citep{hu2022lora}.
+MulTaBench applies that adaptation to the last three layers and calls the result a target-aware representation.
+The benchmark keeps a dataset only when, for at least three of five learners, the frozen joint model beats both unimodal models and the adapted encoder then beats the frozen joint model.
+
+Financial text has its own line of work.
+Dictionary methods score the tone of a 10-K \citep{loughran2011liability}.
+Regression on the report text can predict market risk \citep{kogan2009predicting}.
+EDGAR-CORPUS supplies 10-K sections already split into items \citep{loukas2021edgar}.
+Those studies show that the filing contains predictive prose.
+They do not test whether that prose still helps after a small set of ratios is included, which is the comparison this dataset is built to support.
+
+\section{Method}
+
+\subsection{Sources and join}
+
+Structured fields come from the SEC Financial Statement Data Sets, quarters 2015Q1 through 2021Q4, restricted to Form 10-K and 10-K/A with a full fiscal year.
+Text comes from EDGAR-CORPUS annual reports for 2016--2020 \citep{loukas2021edgar}.
+The tables are joined on the ten-digit CIK and the fiscal year.
+The 2021 statements supply the year-$t{+}1$ outcome for a 2020 filing, and 2015 supplies the prior year used to form changes.
+After the label filter below, 4{,}803 firm-years remain.
+We draw 1{,}000 of them uniformly with sample seed 42.
+The draw is between firms and years, not a firm-held-out split.
+
+\subsection{Label}
+
+For each firm-year we form three changes from year $t$ to $t{+}1$: operating income, interest coverage, and operating cash flow.
+Each change is standardized on the pool, and the deterioration score is their mean.
+A lower score is worse.
+The worst 25\% of the score is the positive class and the best 55\% is the negative class.
+The middle 20\% is discarded, so the label compares clear deterioration with clear health rather than neighboring percentiles.
+On the 1{,}000-row draw the positive rate is 0.305.
+The label is a relative tail of this pool, not a bankruptcy filing.
+
+\subsection{Risk-factor text}
+
+Item~1A is used instead of the opening of Item~7.
+The opening of the management discussion is dominated by safe-harbor language, whereas Item~1A is the section that lists risks.
+A full Item~1A is far longer than the 512-token encoder window, and its first paragraphs are often a legend shared across filings.
+We therefore take the first sentence of each paragraph and apply four filters.
+A sentence must have 8 to 42 words and a digit fraction below 0.12.
+Sentences that contain a fixed list of boilerplate phrases are removed, including forward-looking statements, the securities-act legend, and generic cyber, personnel, and tax language.
+Sentences copied into more than 15\% of filings are removed, as are sentences whose content words appear, on average, in more than 15\% of filings.
+Of what remains, the first ten sentences in document order are kept.
+The CSV stores that excerpt without an extra encoder prefix.
+MulTaBench adds the E5 passage prefix itself.
+
+\subsection{Structured columns}
+
+The numeric columns are log total assets, debt to assets, the current ratio, cash to assets, and asset turnover.
+Margins, coverage, return on assets, growth, and capital expenditure were not used as inputs.
+Those quantities either restate the changes inside the label or tend to be narrated in the same words as the risk text.
+Capital expenditure to assets and fiscal year were removed after they failed to improve the average of the two gaps across folds.
+The current ratio and asset turnover are heavy-tailed, so each is replaced by $\mathrm{sign}(x)\log(1+|x|)$, rounded to three decimals.
+The other ratios stay on their winsorized scale, with the sample clipped at the 1st and 99th percentiles before that transform.
+Deleting rows, by contrast, was not helpful.
+Removing high-leverage firms or the smallest firms made the ratios easier and the text worse.
+The final table therefore changes columns, not the set of firm-years.
+
+\subsection{Evaluation}
+
+We use the MulTaBench evaluator without hyperparameter search.
+The five learners are LightGBM, CatBoost, TabM, TabPFN~2.0, and TabPFN-2.5.
+Each is trained in four conditions: ratios only, text only, both with a frozen E5-small encoder, and both after LoRA adaptation of the last three encoder layers.
+LoRA uses rank 16, learning rate $10^{-4}$, at most 50 epochs, patience 3, and weight decay $10^{-3}$.
+Embeddings are mean-pooled and reduced by PCA to 30 dimensions, fit on the training split only.
+Each fold holds out 10\% of the rows with stratification.
+The fold index $k$ uses random state $42{+}k$, so fold 0 is the split used during development.
+Condition means are rounded to three decimals before subtraction.
+For a learner, the joint gap is the frozen joint score minus the better unimodal score, and the awareness gap is the fine-tuned joint score minus the frozen joint score.
+The reported averages are the means of those five learner gaps.
+
+\section{Results}
+
+Table~\ref{tab:main} is the five-fold mean on the final table.
+The average joint gap is $+0.005$ and the average awareness gap is $+0.005$.
+TabM, TabPFN~2.0, and TabPFN-2.5 have both gaps positive.
+LightGBM's awareness gap rounds to zero and its joint gap is negative, because the ratios alone score 0.599 against a frozen joint score of 0.580.
+CatBoost's frozen joint model beats its ratios by 0.007, and fine-tuning then gives that gain back.
+
+\begin{table}[t]
+\centering
+\caption{Five-fold mean AUROC on the final table. Gaps use means rounded to three decimals.}
+\label{tab:main}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lcccccc}
+\toprule
+Model & Struct. & Text & Frozen & TAR & $\Delta_{\mathrm{J}}$ & $\Delta_{\mathrm{A}}$ \\
+\midrule
+LightGBM & 0.599 & 0.516 & 0.580 & 0.581 & $-0.019$ & 0.001 \\
+CatBoost & 0.601 & 0.541 & 0.608 & 0.596 & 0.007 & $-0.012$ \\
+TabM & 0.523 & 0.548 & 0.555 & 0.569 & 0.007 & 0.014 \\
+TabPFN 2.0 & 0.570 & 0.568 & 0.595 & 0.605 & 0.025 & 0.010 \\
+TabPFN 2.5 & 0.569 & 0.584 & 0.590 & 0.603 & 0.006 & 0.013 \\
+\midrule
+Average & 0.572 & 0.551 & 0.586 & 0.591 & 0.005 & 0.005 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The gaps are not stable across folds.
+Averaging the per-fold gaps, rather than subtracting the rounded five-fold means, gives joint gaps of $+0.021$, $-0.021$, $+0.020$, $+0.004$, and $-0.033$ on folds 0 through 4.
+Fold 0 is the development split.
+On that split an earlier version of the table, before fiscal year was removed and before the signed log, had average gaps of $+0.036$ and $+0.018$.
+The same earlier table, evaluated on all five folds, had average gaps of $-0.001$ and $+0.004$ (Appendix~\ref{app:capex}).
+Text-only AUROC moves much more than the structured score.
+For LightGBM on the final table, text-only ranges from 0.461 to 0.602 across folds, while the structured score stays between 0.558 and 0.652.
+
+Two curation choices explain most of this pattern.
+First, the excerpt is short, about three sentences and 50 words at the median, because the frequency filter removes generic risk language.
+That text is informative on some splits and weak on others.
+When it is weak, several joint models follow it and fall behind the ratios, which turns the joint gap negative.
+Second, row filters that looked helpful on fold 0 removed the filings on which the text model had learned.
+High leverage and small firm size marked joint errors in one test split.
+Deleting those rows raised the structured score and lowered the text score on a refit.
+Changing the numeric columns, rather than the sample, was the edit that left both average gaps positive.
+
+TabPFN~2.0 is the clearest success.
+Its frozen joint score of 0.595 exceeds both unimodal scores, and fine-tuning adds another 0.010.
+TabM is different.
+Its structured score is the weakest of the five, 0.523, so the joint gap is a recovery from a weak ratio model rather than a large lift over a strong one.
+Its awareness gap of 0.014 is real on the five-fold mean, but on individual folds the fine-tuned model often loses the frozen model's gain.
+With about 900 training rows, LoRA has little text to adapt and can memorize a split.
+
+\section{Conclusion}
+
+Item~1A, reduced to ten filing-specific leads, adds a small amount of information about next-year deterioration beyond size, leverage, liquidity, and turnover.
+Adapting E5 with LoRA adds a gain of the same size.
+Both statements are true for the five-fold mean of the final table, and both are carried by three of the five learners.
+They are not true for every fold.
+A result computed on the development fold is not a safe summary of this dataset.
+
+The label is a percentile of three accounting changes, not a default or a delisting, and the 1{,}000 rows are a random draw rather than a split that holds out firms.
+The recipe was chosen using early folds of that draw, so the five-fold mean is not a completely untouched evaluation.
+Test folds contain about 100 rows, which is enough for the sign of a gap to flip.
+A next study should freeze the table before the reported folds, split by firm rather than by row, and test whether a longer excerpt can be added without returning the boilerplate that the frequency filter was built to remove.
+
+\begin{thebibliography}{10}
+\bibitem[Altman(1968)]{altman1968financial}
+Altman, E.~I. (1968).
+Financial ratios, discriminant analysis and the prediction of corporate bankruptcy.
+\textit{The Journal of Finance}, 23(4), 589--609.
+
+\bibitem[Arazi et~al.(2026)]{arazi2026multabench}
+Arazi, A., Shapira, E., Grunblat, S., Ventura, M., Hoffer, E., Blayer, G., Holzm{\"u}ller, D., Purucker, L., Varoquaux, G., Hutter, F., and Reichart, R. (2026).
+MulTaBench: Benchmarking multimodal tabular learning with text and image.
+\textit{arXiv:2605.10616}.
+
+\bibitem[Gorishniy et~al.(2025)]{gorishniy2025tabm}
+Gorishniy, Y., Kotelnikov, A., and Babenko, A. (2025).
+TabM: Advancing tabular deep learning with parameter-efficient ensembling.
+\textit{International Conference on Learning Representations}.
+
+\bibitem[Grinsztajn et~al.(2025)]{grinsztajn2025tabpfn25}
+Grinsztajn, L., Fl{\"o}ge, K., Key, O., Birkel, F., Jund, P., Roof, B., J{\"a}ger, B., Safaric, D., Alessi, S., Hayler, A., and others (2025).
+TabPFN-2.5: Advancing the state of the art in tabular foundation models.
+\textit{arXiv:2511.08667}.
+
+\bibitem[Hollmann et~al.(2025)]{hollmann2025tabpfn}
+Hollmann, N., M{\"u}ller, S., Purucker, L., Krishnakumar, A., K{\"o}rfer, M., Hoo, S.~B., Schirrmeister, R.~T., and Hutter, F. (2025).
+Accurate predictions on small data with a tabular foundation model.
+\textit{Nature}, 637, 319--326.
+
+\bibitem[Hu et~al.(2022)]{hu2022lora}
+Hu, E.~J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., and Chen, W. (2022).
+LoRA: Low-rank adaptation of large language models.
+\textit{International Conference on Learning Representations}.
+
+\bibitem[Ke et~al.(2017)]{ke2017lightgbm}
+Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., Ye, Q., and Liu, T.-Y. (2017).
+LightGBM: A highly efficient gradient boosting decision tree.
+\textit{Advances in Neural Information Processing Systems}.
+
+\bibitem[Kogan et~al.(2009)]{kogan2009predicting}
+Kogan, S., Levin, D., Routledge, B.~R., Sagi, J.~S., and Smith, N.~A. (2009).
+Predicting risk from financial reports with regression.
+\textit{Proceedings of NAACL-HLT}, 272--280.
+
+\bibitem[Loughran and McDonald(2011)]{loughran2011liability}
+Loughran, T. and McDonald, B. (2011).
+When is a liability not a liability? Textual analysis, dictionaries, and 10-Ks.
+\textit{The Journal of Finance}, 66(1), 35--65.
+
+\bibitem[Loukas et~al.(2021)]{loukas2021edgar}
+Loukas, L., Fergadiotis, M., Androutsopoulos, I., and Malakasiotis, P. (2021).
+EDGAR-CORPUS: Billions of tokens make the world go round.
+\textit{Proceedings of the Third Workshop on Economics and Natural Language Processing}, 13--18.
+
+\bibitem[Prokhorenkova et~al.(2018)]{prokhorenkova2018catboost}
+Prokhorenkova, L., Gusev, G., Vorobev, A., Dorogush, A.~V., and Gulin, A. (2018).
+CatBoost: Unbiased boosting with categorical features.
+\textit{Advances in Neural Information Processing Systems}.
+
+\bibitem[Wang et~al.(2022)]{wang2022e5}
+Wang, L., Yang, N., Huang, X., Jiao, B., Yang, L., Jiang, D., Majumder, R., and Wei, F. (2022).
+Text embeddings by weakly-supervised contrastive pre-training.
+\textit{arXiv:2212.03533}.
+\end{thebibliography}
+
+\appendix
+\section{Additional result tables}
+\label{app:capex}
+
+\begin{table}[h]
+\centering
+\caption{Five-fold mean AUROC before removing fiscal year and before the signed log. Capital expenditure is already excluded. This is the table whose fold 0 looked strongest.}
+\label{tab:capex}
+\scriptsize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lcccccc}
+\toprule
+Model & Struct. & Text & Frozen & TAR & $\Delta_{\mathrm{J}}$ & $\Delta_{\mathrm{A}}$ \\
+\midrule
+LightGBM & 0.611 & 0.516 & 0.559 & 0.590 & $-0.052$ & 0.031 \\
+CatBoost & 0.628 & 0.541 & 0.611 & 0.594 & $-0.017$ & $-0.017$ \\
+TabM & 0.542 & 0.548 & 0.587 & 0.572 & 0.039 & $-0.015$ \\
+TabPFN 2.0 & 0.579 & 0.568 & 0.594 & 0.604 & 0.015 & 0.010 \\
+TabPFN 2.5 & 0.582 & 0.584 & 0.595 & 0.605 & 0.011 & 0.010 \\
+\midrule
+Average & 0.588 & 0.551 & 0.589 & 0.593 & $-0.001$ & 0.004 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Per-fold AUROC for LightGBM on the final table, illustrating the split sensitivity in Section 5. Scores are rounded to three decimals before the gaps.}
+\label{tab:lightfolds}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccccc}
+\toprule
+Fold & Struct. & Text & Frozen & TAR & $\Delta_{\mathrm{J}}$ & $\Delta_{\mathrm{A}}$ \\
+\midrule
+0 & 0.586 & 0.602 & 0.663 & 0.674 & 0.061 & 0.011 \\
+1 & 0.608 & 0.488 & 0.581 & 0.602 & $-0.027$ & 0.021 \\
+2 & 0.558 & 0.461 & 0.518 & 0.555 & $-0.040$ & 0.037 \\
+3 & 0.652 & 0.465 & 0.608 & 0.530 & $-0.044$ & $-0.078$ \\
+4 & 0.590 & 0.563 & 0.527 & 0.543 & $-0.063$ & 0.016 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
